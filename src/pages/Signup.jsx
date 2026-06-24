@@ -4,20 +4,15 @@ import { supabase } from '../supabase'
 
 export default function Signup() {
   const navigate = useNavigate()
-  const [form, setForm] = useState({ email: '', password: '' })
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handle = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }))
-
-  const submit = async e => {
-    e.preventDefault()
+  const submit = async () => {
     setError('')
     setLoading(true)
-    const { error } = await supabase.auth.signUp({
-      ...form,
-      options: { emailRedirectTo: undefined, data: {} }
-    })
+    const { error } = await supabase.auth.signUp({ email, password })
     if (error) { setError(error.message); setLoading(false) }
     else navigate('/dashboard')
   }
@@ -26,16 +21,10 @@ export default function Signup() {
     <div className="page-center">
       <div className="card">
         <h2>Create account</h2>
-        <form onSubmit={submit}>
-          <label>Email
-            <input name="email" type="email" value={form.email} onChange={handle} required autoFocus />
-          </label>
-          <label>Password
-            <input name="password" type="password" value={form.password} onChange={handle} required minLength={6} />
-          </label>
-          {error && <p className="error">{error}</p>}
-          <button className="btn full" disabled={loading}>{loading ? 'Creating…' : 'Create account'}</button>
-        </form>
+        <input placeholder="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} />
+        <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
+        {error && <p className="error">{error}</p>}
+        <button className="btn full" onClick={submit} disabled={loading}>{loading ? 'Creating…' : 'Create account'}</button>
         <p className="switch">Have an account? <Link to="/login">Sign in</Link></p>
       </div>
     </div>

@@ -1,38 +1,32 @@
+// ─── Login.jsx ─────────────────────────────────────────────────
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { supabase } from '../supabase'
+import { useNavigate, Link } from 'react-router-dom'
+// import { signIn } from '../auth'
+import {supabase} from '../supabase.js'
 
 export default function Login() {
   const navigate = useNavigate()
-  const [form, setForm] = useState({ email: '', password: '' })
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
 
-  const handle = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }))
-
-  const submit = async e => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
-    const { error } = await supabase.auth.signInWithPassword(form)
-    if (error) { setError(error.message); setLoading(false) }
-    else navigate('/dashboard')
+  const submit = async () => {
+    try {
+      await supabase.auth.signInWithPassword({email, password})
+      navigate('/dashboard')
+    } catch (e) {
+      setError(e.message)
+    }
   }
 
   return (
     <div className="page-center">
       <div className="card">
         <h2>Sign in</h2>
-        <form onSubmit={submit}>
-          <label>Email
-            <input name="email" type="email" value={form.email} onChange={handle} required autoFocus />
-          </label>
-          <label>Password
-            <input name="password" type="password" value={form.password} onChange={handle} required />
-          </label>
-          {error && <p className="error">{error}</p>}
-          <button className="btn full" disabled={loading}>{loading ? 'Signing in…' : 'Sign in'}</button>
-        </form>
+        <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
+        <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
+        {error && <p className="error">{error}</p>}
+        <button className="btn full" onClick={submit}>Sign in</button>
         <p className="switch">No account? <Link to="/signup">Sign up</Link></p>
       </div>
     </div>

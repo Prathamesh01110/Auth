@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { supabase } from '../supabase'
-import { useAuth } from '../AuthContext'
+import { useNavigate } from 'react-router-dom'
+import { supabase } from '../supabase.js'
 
 export default function Dashboard() {
-  const { user } = useAuth()
   const navigate = useNavigate()
+  const [user, setUser] = useState(null)
   const [money, setMoney] = useState([])
   const [form, setForm] = useState({ label: '', amount: '' })
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setUser(data.session?.user ?? null))
+    load()
+  }, [])
 
   const load = async () => {
     const { data } = await supabase
@@ -16,8 +20,6 @@ export default function Dashboard() {
       .order('created_at', { ascending: false })
     setMoney(data || [])
   }
-
-  useEffect(() => { load() }, [])
 
   const add = async () => {
     if (!form.label || !form.amount) return
@@ -42,27 +44,14 @@ export default function Dashboard() {
           <button className="btn btn-ghost sm" onClick={() => supabase.auth.signOut().then(() => navigate('/'))}>Sign out</button>
         </div>
       </header>
-
       <main className="dash-main">
-        {/* Money Tracker */}
         <h2>Money Tracker</h2>
         <p className="sub">Total: ₹{total.toFixed(2)}</p>
-
         <div className="inline-form" style={{ marginBottom: '1rem' }}>
-          <input
-            placeholder="Label"
-            value={form.label}
-            onChange={e => setForm(f => ({ ...f, label: e.target.value }))}
-          />
-          <input
-            placeholder="Amount"
-            type="number"
-            value={form.amount}
-            onChange={e => setForm(f => ({ ...f, amount: e.target.value }))}
-          />
+          <input placeholder="Label" value={form.label} onChange={e => setForm(f => ({ ...f, label: e.target.value }))} />
+          <input placeholder="Amount" type="number" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
           <button className="btn" onClick={add}>Add</button>
         </div>
-
         <ul className="item-list" style={{ marginBottom: '2.5rem' }}>
           {money.map(m => (
             <li key={m.id}>
