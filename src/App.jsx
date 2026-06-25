@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { AuthProvider } from './AuthContext'
 import Protected from './Protected'
 
 // Public pages
@@ -17,7 +16,7 @@ const P = ({ children }) => <Protected>{children}</Protected>
 
 export default function App() {
   return (
-    <AuthProvider>
+    // <AuthProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/"         element={<Home />} />
@@ -27,6 +26,6 @@ export default function App() {
           <Route path="/tools/ai"       element={<P><AI /></P>} />
         </Routes>
       </BrowserRouter>
-    </AuthProvider>
+    // </AuthProvider>
   )
 }

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
-// import { getUser } from './auth'
 import { supabase } from './supabase'
 
 export default function Protected({ children }) {

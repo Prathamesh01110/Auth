@@ -1,8 +1,12 @@
 import { Link } from 'react-router-dom'
-import { useAuth } from '../AuthContext'
+import { useState,useEffect } from 'react'
+import { supabase } from '../supabase'
 
 export default function Home() {
-  const { user } = useAuth()
+  const [user,setUser]=useState("")
+useEffect(() => {
+  supabase.auth.getSession().then(({ data }) => setUser(data.session?.user ?? null))
+}, [])
 
   return (
     <div className="page-center">
